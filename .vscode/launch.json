@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "name": "(gdb) debug kern",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/zos",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerServerAddress": "localhost:1234", // replace it with your own
+      "miDebuggerPath": "/opt/riscv/bin/riscv64-unknown-elf-gdb", // replace it with your own
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Set Disassembly Flavor to Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
