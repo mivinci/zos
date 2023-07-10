@@ -1,5 +1,5 @@
-#ifndef _ZOS_SBI_H
-#define _ZOS_SBI_H
+#ifndef _SBI_ECALL_H
+#define _SBI_ECALL_H
 
 #define SBI_EXT_0_1_SET_TIMER              0x0
 #define SBI_EXT_0_1_CONSOLE_PUTCHAR        0x1
@@ -47,4 +47,18 @@ static inline void sbi_shutdown(void) {
   sbi_ecall(SBI_EXT_0_1_SHUTDOWN, 0, 0, 0, 0);
 }
 
-#endif  // _ZOS_SBI_H
+// struct sbiret {
+//   long error;
+//   long value;
+// };
+
+static inline void sbi_set_timer(unsigned long stime_value) {
+  sbi_ecall(SBI_EXT_TIME, 0, stime_value, 0, 0);
+}
+
+static inline void sbi_send_ipi(unsigned long hart_mask,
+                                unsigned long hart_mask_base) {
+  sbi_ecall(SBI_EXT_IPI, 0, hart_mask, hart_mask_base, 0);
+}
+
+#endif  // _SBI_ECALL_H

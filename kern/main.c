@@ -1,9 +1,15 @@
-#include <zos/sbi.h>
+#include <sbi/ecall.h>
+#include <zos/task.h>
 #include <zos/types.h>
 
-// for now we simply output an string and shutdown it down :)
+#include <stdio.h>
 
 void main(int a0, usize a1) {
-  sbi_console_puts("Hello, ZOS\n");
+  printf("[%s:%d] Hello, ZOS :)\n", current->name, a0);
   sbi_shutdown();
+}
+
+void setup_init_task(struct task *p) {
+  p->parent = p;
+  p->name = "init";
 }

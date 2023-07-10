@@ -1,39 +1,69 @@
-#include <zos/zos.h>
+#include <zos/mm.h>
 
   .text
   .globl _start
 _start:
-  // SBI brings us to
+  // SBI brings us:
   // a0 == hartid
   // pc == 0x80200000
   // sp == 0x800xxxxx
 
-  // set up boot stack for each hart.
-  // sp = bootstack + PGSIZE * (hartid + 1)
-  add t0, a0, 1
-  li  t1, PGSIZE
-  mul t0, t0, t1
-  la  sp, bootstack
-  add sp, sp, t0
+  // disable all interrupts.
+  csrw     sie,    zero
+  csrw     sip,    zero
 
-  // disable and clear all interrupts for now.
-  csrw sie, zero
-  csrw sip, zero
+  // lets see whos lucky to boot the kernel.
+  la       t0,     hart_lottery
+  li       t1,     1
+  amoadd.w t0,     t1,    (t0)
+  bnez     t0,     wait
 
-  // set up exception vectors
-  la a3, spin
-  csrw stvec, a3
+  // use the init_task stack for the booting
+  // process.
+  la       sp,     init_task + PGSIZE
+  addi     sp,     sp,   -8
 
-  // call our kernel's main function.
-  jal main
+  // save a0 and a1 since they are used for
+  // function calls.
+  sw       a0,     0(sp)
+  sw       a1,     4(sp)
+
+  // set up trap vector and zero out sscratch
+  // indicate that we are in kernelspace.
+  la       a0,       trap_enter
+  csrw     stvec,    a0
+  csrw     sscratch, zero
+
+  // set up init_task
+  la       a0,   init_task
+  call     setup_init_task
+
+  // restore a0 and a1.
+  lw       a1,    4(sp)
+  lw       a0,    0(sp)
+
+  // restore sp and load the address of init_task
+  // to tp so that it can be accessed directly via
+  // macro 'current'. then tail-call to our C main
+  // function.
+  addi     sp,    sp,   8
+  la       tp,    init_task
+  tail     main
 
 
-spin:
+wait:
+  // TODO: how to notify other harts to wake up ??
   wfi
-  j spin
+  j        wait
 
-  .bss
-  .align 4  // RISC-V stack has to be 16 bytes aligned.
-  .globl bootstack
-bootstack:
-  .skip PGSIZE * NCPU
+
+  .data
+  .align   2
+hart_lottery:
+  .word    0
+
+
+  .align   12
+  .globl   init_task
+init_task:
+  .skip    PGSIZE
