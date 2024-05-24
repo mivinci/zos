@@ -1,0 +1,22 @@
+ ______ ___
+|_ / _ (_-<
+/__\___/__/
+
+A toy OS for RISC-V.
+
+I know it's worthless to make an operating system for a specific architecture, but this project is for myself to learn RISC-V and operating systems. It's being developed with QEMU for now but will be, if possible, ported to MangoPi MQ-Pro - a cute pink SoC. I will try to make it as UNIX as I can, and POSIX-compatible hopefully.
+
+
+References
+==========
+
+* RISC-V Spec Vol 1: Unprivileged ISA
+* RISC-V Spec Vol 2: Privileged Architecture
+* RISC-V Supervisor Binary Interface Specification
+* The RISC-V Reader: An Open Architecture Atlas
+* The Design of the UNIX Operating System - Maurice J. Bach
+* Modern Operating Systems - Andrew S. Tanenbaum, Herbert Bos
+* Linux-0.12
+
+
+MIT licensed.
